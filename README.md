@@ -3,8 +3,8 @@
 Go port of _A Very Fast 64–Bit Date Algorithm_, based on [A
 Very Fast 64–Bit Date Algorithm: 30–40%
 faster](https://www.benjoffe.com/fast-date-64) by Ben Joffe.
-Special thanks to [Ben Joffe](https://www.benjoffe.com/) for
-writing such an easy to follow blog post and implementation.
+Special thanks to @benjoffe for writing such an easy to follow blog post and
+implementation.
 
 ## Usage
 
@@ -39,7 +39,8 @@ algorithm and provides date round trip functions for
 
 - `gofastdate.FromUnix`
 - `gofastdate.FromTime`
-- `gofastdate.Date.ToTime`
+- `gofastdate.Date.Time`
+- `gofastdate.Date.Unix`
 
 While not depending on any dependency and striving to match
 Joffe's implementation, where applicable.
