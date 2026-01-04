@@ -22,7 +22,7 @@ func TestDateUnixAndTime(t *testing.T) {
 		t.Run(
 			time.Date(int(tt.year), time.Month(tt.month), int(tt.day), 0, 0, 0, 0, time.UTC).Format("2006-01-02"),
 			func(t *testing.T) {
-				d := Date{day: tt.day, month: tt.month, year: tt.year}
+				d := Date{day: uint8(tt.day), month: uint8(tt.month), year: tt.year}
 				gotTime := d.Time()
 				expected := time.Date(int(tt.year), time.Month(tt.month), int(tt.day), 0, 0, 0, 0, time.UTC)
 				if !gotTime.Equal(expected) {
@@ -53,7 +53,8 @@ func TestFromUnixToDate(t *testing.T) {
 		t.Run(time.Unix(u, 0).UTC().Format("2006-01-02"), func(t *testing.T) {
 			d := FromUnix(u)
 			t0 := time.Unix(u, 0).UTC()
-			if d.year != uint64(t0.Year()) || d.month != uint64(t0.Month()) || d.day != uint64(t0.Day()) {
+			if d.year != uint64(t0.Year()) || d.month != uint8(t0.Month()) ||
+				d.day != uint8(t0.Day()) {
 				t.Errorf("FromUnix(%d) -> Date %+v; want Y/M/D %04d/%02d/%02d",
 					u, d, t0.Year(), t0.Month(), t0.Day())
 			}

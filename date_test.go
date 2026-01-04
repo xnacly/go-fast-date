@@ -26,7 +26,7 @@ var sampleUnix = []int64{
 }
 
 func BenchmarkTimeUnix(b *testing.B) {
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		for _, u := range sampleUnix {
 			_ = time.Unix(u, 0).UTC().Unix()
 		}
@@ -34,7 +34,7 @@ func BenchmarkTimeUnix(b *testing.B) {
 }
 
 func BenchmarkGoFastDateUnix(b *testing.B) {
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		for _, d := range sampleDates {
 			_ = d.Unix()
 		}
@@ -56,7 +56,6 @@ func init() {
 }
 
 func BenchmarkStressTimeUnixToDate(b *testing.B) {
-	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		for _, u := range stressUnixTimestamps {
 			t := time.Unix(u, 0).UTC()
@@ -68,7 +67,6 @@ func BenchmarkStressTimeUnixToDate(b *testing.B) {
 }
 
 func BenchmarkStressGoFastDateFromUnix(b *testing.B) {
-	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		for _, u := range stressUnixTimestamps {
 			_ = FromUnix(u)

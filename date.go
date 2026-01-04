@@ -3,15 +3,22 @@ package gofastdate
 import "math/bits"
 
 type Date struct {
-	day   uint64
-	month uint64
-	year  uint64
+	year uint64
+	// TODO: maybe pack these two in one uint8, since we only need 1-12 for
+	// months and 1-31 for days, meaning we could assign the first four bits to
+	// months and the latter four to days?
+	month uint8
+	day   uint8
 }
 
 func FromUnix(unix int64) Date {
 	days := unix / 86400
 	day, month, year := benjoffeFastDate(days)
-	return Date{day, month, year}
+	return Date{
+		year,
+		uint8(month),
+		uint8(day),
+	}
 }
 
 // ported from https://www.benjoffe.com/fast-date-64
