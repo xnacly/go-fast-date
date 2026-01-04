@@ -51,20 +51,8 @@ func benjoffeFastDate(dayNumber int64) (uint64, uint64, uint64) {
 	// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 	// DEALINGS IN THE SOFTWARE.
 
-	const (
-		eRAS    uint64 = 4726498270 // Use 14704 for 32–bit
-		dSHIFT  uint64 = 146097*eRAS - 719469
-		ySHIFT  uint64 = 400*eRAS - 1
-		c1      uint64 = 505054698555331   // floor(2^64*4/146097)
-		c2      uint64 = 50504432782230121 // ceil(2^64*4/1461)
-		c3      uint64 = 8619973866219416  // floor(2^64/2140)
-		SCALE   uint64 = 32                // SCALE = 32 for non-ARM builds
-		SHIFT_0 uint64 = 30556 * 32        // 30556 * SCALE = 977792
-		SHIFT_1 uint64 = 5980 * 32         // 5980  * SCALE = 191360
-	)
-
 	// Adjust for 100/400 leap year rule.
-	rev := dSHIFT - uint64(dayNumber) // Reverse day count
+	rev := d_shift - uint64(dayNumber) // Reverse day count
 
 	// uint64_t cen = (uint128_t(C1) * rev) >> 64;
 	hi, _ := bits.Mul64(rev, c1) // Divide 36524.25
@@ -76,25 +64,25 @@ func benjoffeFastDate(dayNumber int64) (uint64, uint64, uint64) {
 	// uint128_t num = uint128_t(C2) * jul;
 	hi, lo := bits.Mul64(jul, c2) // Divide 365.25
 	// uint32_t yrs = Y_SHIFT - uint32_t(num >> 64);
-	yrs := ySHIFT - hi // Forward year
+	yrs := y_shift - hi // Forward year
 	// uint64_t low = uint64_t(num);
 	low := lo // Lower 64 bits
 	// uint32_t ypt = uint32_t(uint128_t(24451 * SCALE) * low >> 64);
-	ypt, _ := bits.Mul64(24451*SCALE, low) // Year-part (backwards)
+	ypt, _ := bits.Mul64(24451*scale, low) // Year-part (backwards)
 
-	bump := ypt < (3952 * SCALE) // Jan or Feb
+	bump := ypt < (3952 * scale) // Jan or Feb
 	// bump ? SHIFT_1 : SHIFT_0
-	shift := SHIFT_0 // Month offset
+	shift := shift_0 // Month offset
 	if bump {
-		shift = SHIFT_1
+		shift = shift_1
 	}
 
 	// Year-modulo-bitshift for leap years.
 	// Also revert to forward direction.
-	N := (yrs%4)*(16*SCALE) + shift - ypt
-	M := N / (2048 * SCALE)
+	N := (yrs%4)*(16*scale) + shift - ypt
+	M := N / (2048 * scale)
 	// uint32_t const D = uint32_t(uint128_t(C3) * (N % (2048 * SCALE)) >> 64);
-	D, _ := bits.Mul64(c3, N%(2048*SCALE))
+	D, _ := bits.Mul64(c3, N%(2048*scale))
 	D += 1
 
 	if bump {

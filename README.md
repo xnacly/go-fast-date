@@ -1,10 +1,13 @@
 # go-fast-date
 
-Go port of _A Very Fast 64–Bit Date Algorithm_, based on [A
-Very Fast 64–Bit Date Algorithm: 30–40%
-faster](https://www.benjoffe.com/fast-date-64) by Ben Joffe.
-Special thanks to @benjoffe for writing such an easy to follow blog post and
-implementation.
+> 3-6x faster than [`time`](https://pkg.go.dev/time), see [Benchmarks](#Benchmarks)
+
+Go port of _A Very Fast 64–Bit Date Algorithm_, based on [A Very Fast 64–Bit
+Date Algorithm: 30–40% faster](https://www.benjoffe.com/fast-date-64) by Ben
+Joffe. Also uses Parts of _The Julian Map: A Faster technique for Gregorian
+Date Conversion_, see [Improvements to the Inverse
+Function](https://www.benjoffe.com/fast-date#inverse). Special thanks to
+@benjoffe for writing such easy to follow blog posts and implementations.
 
 ## Usage
 
@@ -47,41 +50,29 @@ Joffe's implementation, where applicable.
 
 ## Benchmarks
 
+| kind   | benchmark                 | `time`       | `go-fast-date` | speedup | runtime reduction |
+| ------ | ------------------------- | ------------ | -------------- | ------- | ----------------- |
+| micro  | BenchmarkDateToUnix       | 194.6 ns/op  | 63.59 ns/op    | 3.06x   | −67.3%            |
+|        | BenchmarkUnixToDate       | 582.9 ns/op  | 90.23 ns/op    | 6.46x   | −84.5%            |
+| stress | BenchmarkStressDateToUnix | 8.697 ms/op  | 2.856 ms/op    | 3.05x   | −67.2%            |
+|        | BenchmarkStressUnixToDate | 27.316 ms/op | 4.286 ms/op    | 6.37x   | −84.3%            |
+
 Benchmarks focus on comparing `gofastdate.FromUnix` with
 `time.Unix`. Run with `go test ./... -bench=.`
 
-### Low end hardware:
-
-- micro benchmark: fastdate `~13%` faster
-- stress: fastdate `~4.2x` faster (8.98ms vs 37.38ms)
-
 ```text
 goos: linux
 goarch: amd64
 pkg: github.com/xnacly/go-fast-date
-cpu: Intel(R) Core(TM) i5-3210M CPU @ 2.50GHz
-BenchmarkTimeUnix-4                     21141045                56.21 ns/op
-BenchmarkGoFastDateUnix-4               24253924                48.90 ns/op
-BenchmarkStressTimeUnixToDate-4               32             37382839 ns/op
-BenchmarkStressGoFastDateFromUnix-4          132              8977516 ns/op
+cpu: AMD Ryzen 7 PRO 7840U w/ Radeon 780M Graphics
+BenchmarkTimeDateToUnix-16                       6215389               194.6 ns/op             0 B/op          0 allocs/op
+BenchmarkGoFastDateToUnix-16                    18198014                63.59 ns/op            0 B/op          0 allocs/op
+BenchmarkTimeUnixToDate-16                       2046949               582.9 ns/op             0 B/op          0 allocs/op
+BenchmarkGoFastDateFromUnix-16                  12165228                90.23 ns/op            0 B/op          0 allocs/op
+BenchmarkStressTimeDateToUnix-16                     135           8696891 ns/op               0 B/op          0 allocs/op
+BenchmarkStressGoFastDateToUnix-16                   391           2855936 ns/op               0 B/op          0 allocs/op
+BenchmarkStressTimeUnixToDate-16                      37          27315987 ns/op               0 B/op          0 allocs/op
+BenchmarkStressGoFastDateFromUnix-16                 282           4285671 ns/op               0 B/op          0 allocs/op
 PASS
-ok      github.com/xnacly/go-fast-date  6.369s
-```
-
-### Mid end hardware:
-
-- micro benchmark: fastdate `~32%` faster
-- stress: fastdate `~4.1x` faster (5.16ms vs 21.41ms)
-
-```text
-goos: linux
-goarch: amd64
-pkg: github.com/xnacly/go-fast-date
-cpu: AMD Ryzen 7 3700X 8-Core Processor
-BenchmarkTimeUnix-16                            35375085                37.20 ns/op
-BenchmarkGoFastDateUnix-16                      47718576                25.21 ns/op
-BenchmarkStressTimeUnixToDate-16                      56             21414260 ns/op
-BenchmarkStressGoFastDateFromUnix-16                 232              5158183 ns/op
-PASS
-ok      github.com/xnacly/go-fast-date  5.463s
+ok      github.com/xnacly/go-fast-date  13.927s
 ```
